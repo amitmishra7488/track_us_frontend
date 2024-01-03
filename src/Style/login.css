@@ -1,0 +1,97 @@
+/* Common styles for both light and dark mode */
+.login-page-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: url("https://e0.pxfuel.com/wallpapers/740/88/desktop-wallpaper-dark-website-background-walldevil-best-background-thumbnail.jpg") no-repeat center center fixed;
+  background-size: cover;
+}
+
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  opacity: 0.4;
+  background-color: black;
+}
+
+.login-form-container {
+  background-color: #333; /* Darker background for dark mode */
+  color: #eee; /* Lighter text for dark mode */
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: -3px -3px 9px #000, 3px 3px 7px rgba(0, 0, 0, 0.671);
+  max-width: 400px;
+  width: 100%;
+}
+
+.heading {
+  font-size: 25px;
+  font-weight: 400;
+  font-family: cursive;
+  text-align: center;
+  margin-bottom: 5px;
+  color: #fff; /* Light text color for headings */
+}
+
+.input-box {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #555; /* Darker border for dark mode */
+  margin-bottom: 20px;
+  background-color: #444; /* Darker input background for dark mode */
+  color: #eee; /* Lighter text color for inputs */
+}
+
+.submit-btn {
+  background-color: #000f1e;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 7px;
+}
+
+.second {
+  margin-top: 7px;
+}
+
+.submit-btn:hover {
+  background-color: #000000;
+}
+
+.separator {
+  border: none;
+  border-top: 1px solid #666; /* Darker border color for dark mode */
+  text-align: center;
+  height: 1px;
+  position: relative;
+}
+
+.separator:before {
+  content: "";
+  display: inline-block;
+  border: 1px solid #666; /* Darker border color for dark mode */
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #444; /* Darker background for dark mode */
+}
+
+@media (max-width: 768px) {
+  .login-form-container {
+    max-width: 90%;
+  }
+}

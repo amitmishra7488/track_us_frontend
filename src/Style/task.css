@@ -1,0 +1,31 @@
+/* Styles for dark mode
+.dark-mode {
+    background-color: #292b2c;
+    color: #ffffff;
+  }
+  
+  .dark-mode-text {
+    color: #ffffff;
+  }
+  
+  .dark-mode-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .dark-mode-item {
+    background-color: #333333;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .dark-mode-button {
+    background-color: #1d2124;
+    color: #ffffff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+   */

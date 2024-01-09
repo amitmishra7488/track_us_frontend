@@ -1,23 +1,35 @@
 import React, { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import { Box, Button, Flex, useColorMode } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Badge,
+  VStack,
+  Text,
+  useColorMode,
+} from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { createExpense, fetchExpense } from "../../redux/thunks/expenseThunks";
-import { FaCommentDollar, FaPlus } from "react-icons/fa"; // Import the icon
+import { FaCommentDollar, FaPlus, FaEye, FaRupeeSign } from "react-icons/fa"; // Import the icon
 import ExpenseDetailsDrawer from "./ExpenseDetailDrawer";
 import ExpenseCreationModal from "./ExpenseCreationModal";
-
+import Cookies from "universal-cookie";
+import axios from "axios";
+import ExpenseReportModal from "./ExpenseReportModal";
 const ExpenseCalendar = () => {
   const { colorMode } = useColorMode();
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
   const dispatch = useDispatch();
   const expenses = useSelector((state) => state.expenses.data);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  useEffect(() => {
-    dispatch(fetchExpense());
-  }, [dispatch]);
+  const cookies = new Cookies();
+  const token = cookies.get("token");
+  const [report, setReport] = useState({});
 
   const tileClassName = ({ date }) => {
     const isExpenseDay = expenses.some((expense) =>
@@ -61,6 +73,37 @@ const ExpenseCalendar = () => {
     dispatch(createExpense(newExpense));
   };
 
+  const expenseReport = async () => {
+    try {
+      const month = selectedMonth.getMonth() + 1;
+      const year = selectedMonth.getFullYear();
+      const expensereport = await axios.get(
+        `https://track-us.vercel.app/user/expenseReport?month=${month}&year=${year}`,
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+      console.log(expensereport.data);
+      setReport(expensereport.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleActiveStartDateChange = ({ activeStartDate }) => {
+    setSelectedMonth(activeStartDate);
+  };
+
+  useEffect(() => {
+    dispatch(fetchExpense());
+  }, [dispatch]);
+
+  useEffect(() => {
+    expenseReport();
+  }, [selectedMonth, expenses]);
+
   return (
     <Box>
       <Flex justifyContent="flex-end" mb="0.5em">
@@ -77,27 +120,108 @@ const ExpenseCalendar = () => {
           onCreateExpense={handleCreateExpense}
         />
       </Flex>
-      <Box
-        p={{ base: "2", md: "4", lg: "6" }}
-        maxW="800px"
-        m="auto"
-        position="relative"
-        zIndex="101"
-      >
-        <Calendar
-          onChange={setSelectedDate}
-          value={selectedDate}
-          tileClassName={tileClassName}
-          onClickDay={handleClickDay}
-          tileContent={tileContent}
-          calendarType={"gregory"}
-        />
+      <Box p={{ base: "2", md: "4", lg: "6" }} m="auto" position="relative">
+        <Flex
+          direction={{ base: "column", md: "row" }}
+          align={{ base: "stretch", md: "center" }}
+          justify={{ base: "flex-start", md: "space-between" }}
+          gap="2%"
+        >
+          {/* Calendar component */}
+          <Box flex="1" mb={{ base: 4, md: 0 }}>
+            <Calendar
+              onChange={setSelectedDate}
+              onActiveStartDateChange={handleActiveStartDateChange}
+              value={selectedDate}
+              tileClassName={tileClassName}
+              onClickDay={handleClickDay}
+              tileContent={tileContent}
+              calendarType={"gregory"}
+            />
+          </Box>
+
+          <Box
+            flex="1"
+            p="4"
+            boxShadow={colorMode === "dark" ? "dark-lg" : "md"}
+          >
+            <VStack align="center" spacing={2} textAlign="center">
+              <Box w="100%">
+                <Badge colorScheme="blue" fontSize="lg">
+                  Monthly Expense Total :{" "}
+                  {new Intl.DateTimeFormat("en-US", { month: "long" }).format(
+                    selectedMonth
+                  ) +
+                    " " +
+                    selectedMonth.getFullYear()}
+                </Badge>
+                <Text
+                  fontSize="2xl"
+                  fontWeight="bold"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <FaRupeeSign style={{ marginRight: "0.5rem" }} />
+                  {report?.basedOnMonth?.total !== null
+                    ? report?.basedOnMonth?.total
+                    : "Not Available"}
+                </Text>
+              </Box>
+
+              <Box w="100%">
+                <Badge colorScheme="green" fontSize="lg">
+                  Last Seven Days Total
+                </Badge>
+                <Text
+                  fontSize="2xl"
+                  fontWeight="bold"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <FaRupeeSign style={{ marginRight: "0.5rem" }} />
+                  {report ? report?.lastSevenDays?.total : "Not Available"}
+                </Text>
+              </Box>
+
+              <Box w="100%">
+                <Badge colorScheme="red" fontSize="lg">
+                  Today's Total
+                </Badge>
+                <Text
+                  fontSize="2xl"
+                  fontWeight="bold"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <FaRupeeSign style={{ marginRight: "0.5rem" }} />
+                  {report ? report?.today?.total : "Not Available"}
+                </Text>
+              </Box>
+              <Button
+                colorScheme="teal"
+                rightIcon={<FaEye />}
+                onClick={() => setReportOpen(true)}
+              >
+                View Report
+              </Button>
+            </VStack>
+          </Box>
+        </Flex>
 
         <ExpenseDetailsDrawer
           isOpen={drawerOpen}
           onClose={() => setDrawerOpen(false)}
           selectedDate={selectedDate}
           expenses={expenses}
+        />
+        <ExpenseReportModal
+          isOpen={reportOpen}
+          onClose={() => setReportOpen(false)}
+          selectedMonth={selectedMonth}
+          expenseData={report?.basedOnMonth?.expenses}
         />
 
         <style>

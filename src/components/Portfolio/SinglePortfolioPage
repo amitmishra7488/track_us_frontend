@@ -1,0 +1,125 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import Cookies from "universal-cookie";
+import {
+  Box,
+  Flex,
+  Heading,
+  Text,
+  CircularProgress,
+  CircularProgressLabel,
+  Button,
+} from "@chakra-ui/react";
+import { FaEdit } from "react-icons/fa";
+import { useDispatch } from "react-redux";
+
+const SinglePortfolioPage = () => {
+  const { portfolioId } = useParams(); // Update the parameter name
+  const [portfolio, setPortfolio] = useState(null);
+  const cookies = new Cookies();
+  const dispatch = useDispatch();
+
+  const fetchPortfolioDetails = async () => {
+    try {
+      const token = cookies.get("token");
+      const response = await axios.get(
+        `https://track-us.vercel.app/user/portfolio/${portfolioId}`,
+        {
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
+      setPortfolio(response.data.portfolio);
+    } catch (error) {
+      console.error("Error fetching portfolio details:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPortfolioDetails();
+    console.log(portfolio);
+  }, [portfolioId]);
+
+  const getColorForProgress = (progress) => {
+    if (progress < 50) {
+      return "red.500";
+    } else if (progress < 80) {
+      return "yellow.500";
+    } else {
+      return "teal.500";
+    }
+  };
+
+
+  
+
+  const handleSaveChanges = async (editedPortfolio) => {
+    try {
+      console.log("Saving changes:", editedPortfolio);
+    
+    } catch (error) {
+      console.error("Error saving changes:", error);
+    }
+  };
+
+  return (
+    <Box p="4">
+      {portfolio ? (
+        <Flex
+          direction={{ base: "column", md: "row" }}
+          justify="space-between"
+          gap={4}
+        >
+          <Box
+            width={{ base: "100%", md: "60%" }}
+            pr={{ md: 4 }}
+            border="1px solid teal"
+            p="4"
+            borderRadius="md"
+            boxShadow="md"
+          >
+            <Heading mb="4" textShadow="2px 2px 4px teal">
+              {portfolio.name}{" "}
+              {/* Use the appropriate property for portfolio name */}
+            </Heading>
+            {/* Add other fields specific to your portfolio schema */}
+            <Flex justifyContent="flex-end">
+              <Button
+                colorScheme="teal"
+                variant="outline"
+                leftIcon={<FaEdit />}
+              >
+                Edit Portfolio
+              </Button>
+            </Flex>
+          </Box>
+
+          <Box width={{ base: "100%", md: "40%" }}>
+            <Flex direction="column" align="center">
+              {/* Add relevant portfolio progress information */}
+              <CircularProgress
+                value={portfolio.progress}
+                size="120px"
+                thickness="12px"
+                color={getColorForProgress(portfolio.progress)}
+              >
+                <CircularProgressLabel>{`${portfolio.progress}%`}</CircularProgressLabel>
+              </CircularProgress>
+
+              <Box mt="4">dfghjkl</Box>
+              {portfolio && (
+                <>{/* Add your portfolio-specific components, like graphs */}</>
+              )}
+            </Flex>
+          </Box>
+        </Flex>
+      ) : (
+        <Text>Loading portfolio details...</Text>
+      )}
+    </Box>
+  );
+};
+
+export default SinglePortfolioPage;

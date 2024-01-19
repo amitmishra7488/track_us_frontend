@@ -86,8 +86,8 @@ const Login = () => {
     setLoading(true);
     fetchLogin(email, password);
   };
-  const handleSignup = () => {
-    navigate("/register");
+  const handleNavigate = (page) => {
+    navigate(`/${page}`);
   };
 
   return (
@@ -150,6 +150,13 @@ const Login = () => {
             </FormControl>
 
             <Button
+              variant="link"
+              color={colorMode === "light" ? "gray.800" : "white"}
+              onClick={()=>handleNavigate('reset-password')}
+            >
+              Forgot Password?
+            </Button>
+            <Button
               type="submit"
               bg={colorMode === "light" ? "#005891" : "#121212"}
               size="lg"
@@ -164,7 +171,7 @@ const Login = () => {
               size="lg"
               w="full"
               color={colorMode === "dark" ? "#121212" : "#EDF2F7"}
-              onClick={handleSignup}
+              onClick={()=>handleNavigate('register')}
             >
               Register
             </Button>

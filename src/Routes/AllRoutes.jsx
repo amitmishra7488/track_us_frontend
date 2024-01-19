@@ -7,6 +7,7 @@ import Dashboard from "../components/Dashboard/Dashboard";
 import { useAuthentication} from  "../utils/authenticated"
 import Signup from "../components/Login/Signup";
 import PromotionalPage from "../components/PromotionalPage/PromotionalPage";
+import ForgotPassword from "../components/Login/ForgotPassword";
 
 export default function AllRoutes() {
   const cookies = new Cookies();
@@ -20,6 +21,7 @@ export default function AllRoutes() {
       <Route path="/intro" element={<PromotionalPage />} />
       <Route path="/" element={isLoggedIn ? <Dashboard /> : <Login />} />
       <Route path="/register" element={isLoggedIn ? <Dashboard /> : <Signup />} />
+      <Route path="/reset-password" element={isLoggedIn ? <Dashboard /> : <ForgotPassword />} />
       <Route path="*" element={isLoggedIn ? <Dashboard /> : <Login />} />
     </Routes>
   );
